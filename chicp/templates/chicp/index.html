@@ -472,18 +472,36 @@
 			$("#save_as_png").click(function() {
 				submit_download_form("png");
 			});
-			
+			// TODO need a variable for max filesize and perhaps server side checking
+			// write a function to ouput error messages to main SVG area
 			$("#open_btn").click(function() {
-				$.FileDialog({multiple: true, dropheight: 200, accept: ".bed"}).on('files.bs.filedialog', function(ev) {
+				$.FileDialog({multiple: false, dropheight: 200, accept: ".bed"}).on('files.bs.filedialog', function(ev) {
 
 					$.isLoading({ text: "Loading" });
 	                var files = ev.files;
 	                var action = $("#fileUpload").attr('action')
-	                
+	                var oversized = 0;
 	                var formData = new FormData();
+	                // check here if file is too big
 	                files.forEach(function(f) {
+	                	console.log(f.size)
+	                	if(f.size > 2e6){
+	                		d3.select("#svg-container").selectAll("*").remove();
+							div = d3.select("#svg-container")
+							.append("div")
+							.html("<h1>File should be smaller than 2Mb</h1>")
+							.attr("id", "message")
+							.attr("class", "chicp_msg");
+	                		$.isLoading( "hide");
+	                		oversized = 1;
+	                	}
+	                	
 	                	formData.append('files[]', f);
 	                });
+	                console.log("Oversized is " + oversized);
+	                if(oversized == 1){
+	                	return true
+	                }
 	                formData.append("csrfmiddlewaretoken", "{{ csrf_token }}")
 	                
 	                $.ajax({
@@ -495,16 +513,29 @@
 	                	success: function(data){
 	                		optGroup = $("#userData");
 	                		userSettings = $("#userSettings");
-	                		for (i = 0; i < data.userSNPTracks.length; i++) {
-	                			f = data.userSNPTracks[i]
-	                			// localStorage[f.value] = f.text
-	                			optGroup.append('<option value="'+f.value+'">'+f.text+'</option>');
-	                			userSettings.append('<li class="deleteUD" id="'+f.value+'">'+
-	                			'<i class="fa fa-trash-o" id="DEL-'+f.value+'"></i>&nbsp;'+f.text+'</li>');
-	                		}
-	        		        $.isLoading( "hide" );
+	                		if(data.error !=200){
+	                			console.log(data.errorMsg)
+	                			d3.select("#svg-container").selectAll("*").remove();
+								div = d3.select("#svg-container")
+								.append("div")
+								.html("<h1>"+data.errorMsg+"</h1>")
+								.attr("id", "message")
+								.attr("class", "chicp_msg");
+	                			$.isLoading( "hide");
+	                			return true;
+	                		}else{
+	                			for (i = 0; i < data.userSNPTracks.length; i++) {
+	                				f = data.userSNPTracks[i]
+	                				// localStorage[f.value] = f.text
+	                				optGroup.append('<option value="'+f.value+'">'+f.text+'</option>');
+	                				userSettings.append('<li class="deleteUD" id="'+f.value+'">'+
+	                				'<i class="fa fa-trash-o" id="DEL-'+f.value+'"></i>&nbsp;'+f.text+'</li>');
+	                			}
+	        		        	$.isLoading( "hide" );
+	        		        }
 	                	},
 	                	error: function(e){
+	                		// perhaps throw an error ?
 	        		        $.isLoading( "hide" );
 	                	}
 	                });

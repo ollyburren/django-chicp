@@ -4,11 +4,14 @@ import logging
 import operator
 import os
 import re
-import subprocess
+# import subprocess
 import random
+from django.utils.six import StringIO
 import locale
 from operator import itemgetter
 import urllib.request
+# import sys
+import bed_validator
 
 from cairosvg import svg2pdf, svg2png
 from svgutils.templates import VerticalLayout, ColumnLayout
@@ -31,6 +34,7 @@ from elastic.aggs import Agg, Aggs
 from elastic.exceptions import SettingsError
 from pydgin_auth.permissions import get_authenticated_idx_and_idx_types
 from pydgin_auth.elastic_model_factory import ElasticPermissionModelFactory as elastic_factory
+from django.template.context_processors import request
 
 
 # Get an instance of a logger
@@ -144,52 +148,131 @@ def chicpea(request):
     return render(request, 'chicp/index.html', context, content_type='text/html')
 
 
-def chicpeaFileUpload(request, url):
+def chicpFileUpload(request, url):
     filesDict = request.FILES
-    user = request.user
     files = filesDict.getlist("files[]")
-    snpTracks = list()
+    # only allowed one file to upload at a time
+    logger.debug(type(files))
+    f = files.pop()
+    logger.debug("SIZE OF FILE IS " + str(f.size))
+    fname = os.path.basename(f.name)
     idx = ElasticSettings.idx('CP_STATS_UD')
+    snpTracks = list()
+    user = request.user
+    blines = f.read().decode("utf-8").splitlines()
+    logger.debug(blines)
+    context = dict()
+    delim = bed_validator.guessDelimiter(blines)
+    (isValidBed, error) = bed_validator.validateBed(blines, delim)
+    if isValidBed is False:
+        # need a way of sending this info back to the user
+        logger.debug(error)
+        context['userSNPTracks'] = snpTracks
+        context['error'] = 500
+        context['errorMsg'] = fname + ': ' + error
+        return HttpResponse(json.dumps(context), content_type="application/json")
+    f.seek(0)
+    ''' probably worth putting in a function so that we can catch exceptions'''
+    with NamedTemporaryFile(delete=False) as destination:
+        # for chunk in f.chunks():
+        for l in blines:
+            # remove comment lines
+            if re.match('\s*#', l):
+                continue
+            l = l + "\n"
+            destination.write(l.encode())
+        logger.debug(destination.name)
+        destination.close()
+        idx_type = os.path.basename(destination.name).lower()
+        logger.debug("index_search --indexName=" + idx + "--indexType=" + idx_type + "--indexBED=" + destination.name)
+        call_command("index_search", indexName=idx, indexType=idx_type, indexBED=destination.name)
+        logger.debug("curl -XPUT "+ElasticSettings.url()+"/"+idx+"/"+idx_type+"/_meta -d '{\"label\": \"" + fname +
+                     "\", \"owner\": \""+user.username+"\", \"uploaded\": \""+str(timezone.now())+"\"}'")
+        os.system("curl -XPUT "+ElasticSettings.url()+"/"+idx+"/"+idx_type+"/_meta -d '{\"label\": \"" + fname +
+                  "\", \"owner\": \""+user.username+"\", \"uploaded\": \""+str(timezone.now())+"\"}'")
+        snpTracks.append({"value": "ud-"+idx_type, "text":  fname})
+        # destination.delete
+        # load the bedfile into our index - why is this not indexKey = idx
+        elastic_factory.create_idx_type_model_permissions(user, indexKey='CP_STATS_UD',
+                                                          indexTypeKey='UD-'+idx_type.upper())
+    f.close()
+    # add meta data on idxtype and filenames to a vector of dictionary objects
+    context['userSNPTracks'] = snpTracks
+    context['error'] = 200
+    context['errorMsg'] = ''
+    # return this as a json dump so we can update the UI accordingly
+    return HttpResponse(json.dumps(context), content_type="application/json")
 
+
+def chicpeaFileUpload(request, url):
+    # get files from HTTP stream
+    filesDict = request.FILES
+    # who is doing this
+    user = request.user
+    # get a list of files
+    files = filesDict.getlist("files[]")
+    # initialise a variable
+    snpTracks = list()
+    # access settings on elastic search
+    idx = ElasticSettings.idx('CP_STATS_UD')
+    # loop through files
     for f in files:
+        # readlines reads file into vector/array. This examines first line
         line = f.readlines()[0].decode()
+        # sloppy code that ignores the first line if it starts with a hash
+        # it does this by taking the next line down (which again might start with a hash
         if line.startswith("#"):
             line = f.readlines()[1].decode()
-
+            # split the line based on tab
         parts = re.split("\t", line)
+        # or split by space if we find that - ?
         if re.match("\s", line):
             parts = re.split("\s", line)
-
+            # if we find that there are not 5 of these then main and carry on
+            # surely we should moan at the user about this ?
         if len(parts) != 5:
             logger.warn("WARNING: unexpected number of columns ("+len(parts)+"): "+line)
             continue
-
+        # next go back to beginning of the file
         f.seek(0)
+        # create a temp file.
         bedFile = NamedTemporaryFile(delete=False)
+        # write current file stream to it
         bedFile.write(f.read())
+        # close it
         bedFile.close()
+        # our idx_type will be our temporary file name
         idx_type = os.path.basename(bedFile.name)
+        # add some stuff to snpTracks, this is for UI and maps a idx type to a file name
         snpTracks.append({"value": "ud-"+idx_type, "text":  f.name})
+        # attempt to delete idx type if it already exists.
         os.system("curl -XDELETE '"+ElasticSettings.url()+"/"+idx+"/"+idx_type+"'")
+        # not sure what this does - I think it loads the data
         call_command("index_search", indexName=idx, indexType=idx_type, indexBED=bedFile.name)
+        # logs that we did the above ?
         logger.debug("index_search --indexName "+idx+" --indexType "+idx_type+" --indexBED "+bedFile.name)
+        # create an index type with various meta data
         os.system("curl -XPUT "+ElasticSettings.url()+"/"+idx+"/"+idx_type+"/_meta -d '{\"label\": \"" + f.name +
                   "\", \"owner\": \""+user.username+"\", \"uploaded\": \""+str(timezone.now())+"\"}'")
         bedFile.delete
+        # load the bedfile into our index - why is this not indexKey = idx
         elastic_factory.create_idx_type_model_permissions(user, indexKey='CP_STATS_UD',
                                                           indexTypeKey='UD-'+idx_type.upper())
 
     context = dict()
+    # add meta data on idxtype and filenames to a vector of dictionary objects
     context['userSNPTracks'] = snpTracks
-
+    # return this as a json dump so we can update the UI accordingly
     return HttpResponse(json.dumps(context), content_type="application/json")
 
 
 def chicpeaDeleteUD(request, url):
     queryDict = request.POST
     idx_type = queryDict.get("userDataIdx")
-    idx = ElasticSettings.idx('CP_STATS_UD')
-    output = subprocess.check_output("curl -XDELETE '"+ElasticSettings.url()+"/"+idx+"/"+idx_type+"'", shell=True)
+    logger.debug(str(idx_type))
+    buf = StringIO()
+    call_command("manage_models", content_type=idx_type, stdout=buf)
+    output = buf.getvalue()
     return HttpResponse(output, content_type="application/json")
 
 
@@ -204,7 +287,7 @@ def chicpeaSearch(request, url):
     searchTerm = queryDict.get("searchTerm").upper()
     searchTerm = searchTerm.replace(",", "")
     searchTerm = searchTerm.replace("..", "-")
-    searchTerm = searchTerm.replace(" ", "") # Chris suggestion to prevent issue with spaces in queries
+    searchTerm = searchTerm.replace(" ", "")  # Chris suggestion to prevent issue with spaces in queries
     snpTrack = queryDict.get("snp_track")
 
     (idx_keys_auth, idx_type_keys_auth) = get_authenticated_idx_and_idx_types(
@@ -377,11 +460,13 @@ def chicpeaSearch(request, url):
 
     # get genes based on this segment
     genes = _build_gene_query(chrom, segmin, segmax)
+    # get snps in this region
     (snps, snpMeta) = _build_snp_query(snpTrack, chrom, segmin, segmax)
+    if 'error' in snps:
+        logger.debug(str(snps))
+        return(JsonResponse(snps))
     frags = _build_frags_query(getattr(chicp_settings, 'DEFAULT_FRAG'), chrom, segmin, segmax)
-
     addList = utils.makeRelative(int(segmin), int(segmax), ['start', 'end'], addList)
-
     retJSON = {"hic": hic,
                "frags": frags,
                "meta": {"ostart": int(segmin),
@@ -575,16 +660,21 @@ def _build_exon_query(chrom, segmin, segmax, genes):
 
 
 def _find_snp_position(snp_track, name):
+    ''' search within dbSNP '''
     if snp_track is None:
         query = ElasticQuery.query_match("id", name)
         elastic = Search(query, idx=ElasticSettings.idx('MARKER'))
         snpResult = elastic.get_json_response()
+        if 'error' in snpResult.keys():
+            logger.debug("POSSIBLE MISSING SNP STUDY CHECK CONFIGURATION" + str(snpResult['error']))
+            return {'error': 'Please check that MARKER index is configured correctly'}
         if(len(snpResult['hits']['hits'])) > 0:
             snp = snpResult['hits']['hits'][0]['_source']
             chrom = snp['seqid'].replace('chr', "")
             position = snp['start']
             return {'chr': chrom, 'start': (position-1), 'end': position, 'name': name}
     else:
+        ''' search within the currently selected data set '''
         mo = re.match(r"(.*)-(.*)", snp_track)
         (group, track) = mo.group(1, 2)
         try:
@@ -595,6 +685,9 @@ def _find_snp_position(snp_track, name):
         query = ElasticQuery.query_match("name", name)
         elastic = Search(query, idx=snp_track_idx)
         snpResult = elastic.get_json_response()
+        if 'error' in snpResult.keys():
+            logger.debug("POSSIBLE MISSING SNP STUDY CHECK CONFIGURATION" + str(snpResult['error']))
+            return {'error': 'Please check that ' + snp_track_idx + ' index is configured correctly'}
         if(len(snpResult['hits']['hits'])) > 0:
             snp = snpResult['hits']['hits'][0]['_source']
             chrom = snp['seqid'].replace('chr', "")
@@ -612,6 +705,8 @@ def _build_snp_query(snp_track, chrom, segmin, segmax):
         # get SNPs based on this segment
         mo = re.match(r"(.*)-(.*)", snp_track)
         (group, track) = mo.group(1, 2)
+        data_type = ElasticSettings.get_label('CP_STATS_'+group.upper(), None, "data_type")
+        snpSettings = getattr(chicp_settings, 'STUDY_DEFAULTS').get(data_type)
         try:
             snp_track_idx = ElasticSettings.idx('CP_STATS_'+group.upper(), snp_track.upper())
         except SettingsError:
@@ -621,17 +716,21 @@ def _build_snp_query(snp_track, chrom, segmin, segmax):
                                       Filter(RangeQuery("end", gte=segmin, lte=segmax)),
                                       utils.snpFields)
         snpQuery = Search(search_query=query, search_from=0, size=10000, idx=snp_track_idx)
-
         # snpResult = snpQuery.get_result()
         # snps = snpResult['data']
         snpResult = snpQuery.get_json_response()
-        snps = []
+        ''' we can catch the error and recover but this can make debugging an issue'''
+        if 'error' in snpResult.keys():
+            logger.debug("POSSIBLE MISSING SNP STUDY CHECK CONFIGURATION" + str(snpResult['error']))
+            return {'error': 'Please check that ' + snp_track_idx + ' index is configured correctly'},snpMeta
+            return [],snpMeta
+        # snps = []
         for hit in snpResult['hits']['hits']:
             snps.append(hit['_source'])
         snps = utils.makeRelative(int(segmin), int(segmax), ['start', 'end'], snps)
 
-        data_type = ElasticSettings.get_label('CP_STATS_'+group.upper(), None, "data_type")
-        snpSettings = getattr(chicp_settings, 'STUDY_DEFAULTS').get(data_type)
+        ''' data_type = ElasticSettings.get_label('CP_STATS_'+group.upper(), None, "data_type")
+        snpSettings = getattr(chicp_settings, 'STUDY_DEFAULTS').get(data_type) '''
 
         for s in snps:
             if float(s['score']) > maxScore:
