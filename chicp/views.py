@@ -11,7 +11,7 @@ import locale
 from operator import itemgetter
 import urllib.request
 # import sys
-import bed_validator
+from chicp import bed_validator
 
 from cairosvg import svg2pdf, svg2png
 from svgutils.templates import VerticalLayout, ColumnLayout
