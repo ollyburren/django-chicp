@@ -1,0 +1,275 @@
+{% extends "chicp/base.html" %}
+{% load staticfiles %}
+{% block header_css %}{% endblock %}
+{% block header_js %}{% endblock %}
+
+
+{% block sidebar_content %}
+	<h3><a href="#about">About</a></h3>
+	<ul style="list-style-type: none;padding-left: 0;">
+		<li><h4 class="docs4"><a href="#how_to_cite">How to cite</a></h4></li>
+		<li><h4 class="docs4"><a href="#run_your_own">How to Run Your Own CHiCP</a></h4></li>
+		<li><h4 class="docs4"><a href="#datasets">Datasets</a></h4></li>
+			<ul>
+			 	<li><h5><a href="#pchic_ds">Promoter Capture Hi-C Datasets</a></h5></li>
+             	<li><h5><a href="#gwas_ds">GWAS Datasets</a></h5></li>
+             	<li><h5><a href="#immunochip_ds">ImmunoChip Datasets</a></h5></li>
+             	<li><h5><a href="#chromstate_ds">Chromatin State Datasets</a></h5></li>
+			</ul>
+		
+	</ul>
+{% endblock %}
+
+
+{% block content %}
+				<a class="doc_link" name="about"></a><h1 class="page_header" id="page_header">About</h1>
+				CHiCP is a web application for visually integrating human population genetic data with promoter capture Hi-C data and was primarily developed to support Javierre et al (2016) Cell.
+				We incorporate autoimmune focused population genetic data (GWAS and ImmunoChip) from <a href="http://www.immunobase.org">ImmunoBase</a> as these are the focus of our research. 
+				However, please contact us if you are interested in hosting your data either on this instance or on your own installation.</p> 
+				
+				<p>CHiCP (<a href="https://www.chicp.org">https://www.chicp.org</a>) is maintained by <a href="http://ollyburren.github.io/">Olly Burren</a> in the <a href="http://chr1swallace.github.io/">Wallace Group</a>, 
+				within the  <a href="http://www.med.cam.ac.uk/">Department of Medicine</a> at the <a href="http:/www.cam.ac.uk">University of Cambridge</a>.
+				Hosting and continued development is supported by the <a href="https://wellcome.ac.uk">Wellcome Trust</a>.</p>
+				
+				<a class="doc_link" name="how_to_cite"></a> 
+				<h3 class="docs3">How To Cite</h3>
+				<p>If you use CHiCP in your work please cite: &nbsp;
+				<b>Schofield EC, Carver T, Achuthan P, Freire-Pritchett P, Spivakov M, Todd JA, Burren OS. 
+				CHiCP: a web-based tool for the integrative and interactive visualization of promoter capture Hi-C datasets.
+				Bioinformatics. (2016) 15:32(16):2511-3</b>
+				<a href="http://bioinformatics.oxfordjournals.org/content/32/16/2511.long">url</a> along with the date accessed.</p>
+				
+				
+				<a class="doc_link" name="run_your_own"></a> 
+				<h3 class="docs3">How to Run Your Own CHiCP</h3>
+				<p>We have an experimental prototype <a href="https://www.docker.com/">Docker</a> repository available on <a href="https://github.com/ollyburren/chicp-docker">GitHub</a>, or you 
+				can download the latest build from <a href="https://github.com/ollyburren/django-chicp">here.</a> Please contact us (see top navigation bar) for more information.</p>
+				
+				<a class="doc_link" name="datasets"></a>
+				<h3 class="docs3">Datasets</h3>
+				
+				<a class="doc_link" name="pchic_ds"></a>
+				<h4 class="docs4">Promoter Capture Hi-C Datasets</h4>
+				<table class="table table-bordered">
+					<tr>
+						<th>Name</th>
+						<th>Citation</th>
+						<th>Availibility</th>
+						<th>Notes</th>
+					</tr>
+					<tr>
+						<td>Javierre et al.</td>
+						<td>Javierre, B.M., Burren, O.S., Wilder, S.P., Kreuzhuber , R., Hill, S.M., et al. (2016). Lineage-specific genome architecture links disease variants to target genes. Cell 167</td>
+						<td>Accept Data Access Agreement</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>Mifsud et al.</td>
+						<td>Mifsud,B. et al. (2015) Mapping long-range promoter contacts in human cells with high-resolution capture Hi-C. Nat. Genet.</td>
+						<td>Accept Data Access Agreement</td>
+						<td>The dataset presented has been recalled using the <a href="http://regulatorygenomicsgroup.org/chicago">CHiCAGO</a> pipeline</td>
+					</tr>
+					<tr>
+						<td>Martin et al.</td>
+						<td>Martin,P. et al. (2015) Capture Hi-C reveals novel candidate genes and complex long-range interactions with related autoimmune risk loci. Nat. Commun., 6, 10069.</td>
+						<td>Private</td>
+						<td>The dataset presented has been recalled using the <a href="http://regulatorygenomicsgroup.org/chicago">CHiCAGO</a> pipeline</td>
+					</tr>
+				</table>
+				
+				
+				<a class="doc_link" name="gwas_ds"></a>
+				<h4 class="docs4">GWAS Datasets</h4>
+				<p>All GWAS datasets marked "Accept Data Access Agreement" are available after creating an account and accepting our data access agreement. We hope to lift this requirement soon.</p>
+				<table class="table table-bordered">
+					<tr>
+						<th>Trait</th>
+						<th>Name</th>
+						<th>Citation</th>
+						<th>Availibility</th>
+						<th>Notes</th>
+					</tr>
+					<tr>
+						<td>Celiac Disease (CEL)</td>
+						<td><a href="http://www.ncbi.nlm.nih.gov/pubmed/20190752" target="_blank">Dubois G (<em>Nat Genet 2010</em>)</a></td>
+						<td>Dubois,P.C.A. et al. (2010) Multiple common variants for celiac disease influencing immune gene expression. Nat. Genet., 42, 295–302.</td>
+						<td>Accept Data Access Agreement</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>Crohn's Disease (CD)</td>
+						<td><a href="http://www.ncbi.nlm.nih.gov/pubmed/21102463" target="_blank">Franke A (<em>Nat Genet 2010</em>)</a></td>
+						<td>Franke,A. et al. (2010) Genome-wide meta-analysis increases to 71 the number of confirmed Crohn’s disease susceptibility loci. Nat. Genet., 42, 1118–1125.</td>
+						<td>Accept Data Access Agreement</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>Multiple Sclerosis (MS)</td>
+						<td><a href="http://www.ncbi.nlm.nih.gov/pubmed/21833088" target="_blank">International Multiple Sclerosis Genetics Consortium (IMSGC) (<em>Nature 2011</em>)</a></td>
+						<td>International Multiple Sclerosis Genetics Consortium et al. (2011) Genetic risk and a primary role for cell-mediated immune mechanisms in multiple sclerosis. Nature, 476, 214–219.</td>
+						<td>Accept Data Access Agreement</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>Primary Billiary Cirrhosis (PBC)</td>
+						<td><a href="http://www.ncbi.nlm.nih.gov/pubmed/26394269" target="_blank">Cordell HJ (<em>Nat Commun 2015</em>)</a></td>
+						<td>Cordell,H.J. et al. (2015) International genome-wide meta-analysis identifies new primary biliary cirrhosis risk loci and targetable pathogenic pathways. Nat. Commun., 6, 8019.</td>
+						<td>Accept Data Access Agreement</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>Rheumatoid Arthritis (RA)</td>
+						<td><a href="http://www.ncbi.nlm.nih.gov/pubmed/24390342" target="_blank">Okada Y (<em>Nature 2014</em>)</a></td>
+						<td>Okada,Y. et al. (2014) Genetics of rheumatoid arthritis contributes to biology and drug discovery. Nature, 506, 376–381.</td>
+						<td>Accept Data Access Agreement</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>Rheumatoid Arthritis (RA)</td>
+						<td><a href="http://www.ncbi.nlm.nih.gov/pubmed/20453842" target="_blank">Stahl EA (<em>Nat Genet 2010</em>)</a></td>
+						<td>Stahl,E.A. et al. (2010) Genome-wide association study meta-analysis identifies seven new rheumatoid arthritis risk loci. Nat. Genet., 42, 508–514.</td>
+						<td>Accept Data Access Agreement</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>Systemic Lupus Erythematosus (SLE)</td>
+						<td><a href="http://www.ncbi.nlm.nih.gov/pubmed/26502338" target="_blank">Bentham J (<em>Nat Genet 2015</em>)</a></td>
+						<td>Bentham,J. et al. (2015) Genetic association analyses implicate aberrant regulation of innate and adaptive immunity genes in the pathogenesis of systemic lupus erythematosus. Nat. Genet.</td>
+						<td>Accept Data Access Agreement</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>Type 1 Diabetes (T1D)</td>
+						<td><a href="http://www.ncbi.nlm.nih.gov/pubmed/19430480" target="_blank">Barrett JC (<em>Nat Genet 2009</em>)</a></td>
+						<td>Barrett,J.C. et al. (2009) Genome-wide association study and meta-analysis find that over 40 loci affect risk of type 1 diabetes. Nat. Genet., 41, 703–707.</td>
+						<td>Accept Data Access Agreement</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>Type 1 Diabetes (T1D)</td>
+						<td><a href="http://www.ncbi.nlm.nih.gov/pubmed/21980299" target="_blank">Bradfield JP (<em>PLoS Genet 2011</em>)</a></td>
+						<td>Bradfield,J.P. et al. (2011) A genome-wide meta-analysis of six type 1 diabetes cohorts identifies multiple associated loci. PLoS Genet., 7, e1002293.</td>
+						<td>Accept Data Access Agreement</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>Type 1 Diabetes (T1D)</td>
+						<td>Cooper et al.</td>
+						<td>Unpublished</td>
+						<td>Private</td>
+						<td>Subset of <a href="http://www.ncbi.nlm.nih.gov/pubmed/19430480" target="_blank">Barrett JC (<em>Nat Genet 2009</em>)</a> imputed to 1000 genomes.</td>
+					</tr>
+					<tr>
+						<td>Ulcerative Colitis (UC)</td>
+						<td><a href="http://www.ncbi.nlm.nih.gov/pubmed/21297633" target="_blank">Anderson CA (<em>Nat Genet 2011</em>)</a></td>
+						<td>Anderson,C.A. et al. (2011) Meta-analysis identifies 29 additional ulcerative colitis risk loci, increasing the number of confirmed associations to 47. Nat. Genet., 43, 246–252.</td>
+						<td>Accept Data Access Agreement</td>
+						<td></td>
+					</tr>
+				</table>
+				
+				<a class="doc_link" name="immunochip_ds"></a>
+				<h4 class="docs4">ImmunoChip Datasets</h4>
+				<p>All ImmunoChip datasets marked "Accept Data Access Agreement" are available after creating an account and accepting our data access agreement. We hope to lift this requirement soon.</p>
+				<table class="table table-bordered">
+					<tr>
+						<th>Trait</th>
+						<th>Name</th>
+						<th>Citation</th>
+						<th>Availibility</th>
+						<th>Notes</th>
+					</tr>
+					<tr>
+						<td>Autoimmune Thyroid Disease</td>
+						<td><a href="http://www.ncbi.nlm.nih.gov/pubmed/22922229" target="_blank">Cooper JD (<em>Hum Mol Genet 2012</em>)</a></td>
+						<td>Cooper,J.D. et al. (2012) Seven newly identified loci for autoimmune thyroid disease. Hum. Mol. Genet., 21, 5202–5208.</td>
+						<td>Accept Data Access Agreement</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>Celiac Disease</td>
+						<td><a href="http://www.ncbi.nlm.nih.gov/pubmed/22057235" target="_blank">Trynka G (<em>Nat Genet 2011</em>)</a></td>
+						<td>Trynka,G. et al. (2011) Dense genotyping identifies and localizes multiple common and rare variant association signals in celiac disease. Nat. Genet., 43, 1193–1201.</td>
+						<td>Accept Data Access Agreement</td>
+						<td></td>
+					</tr>
+					
+					<tr>
+						<td>Crohn's Disease (CD)</td>
+						<td><a href="http://www.ncbi.nlm.nih.gov/pubmed/23128233" target="_blank">Jostins L (<em>Nature 2012</em>)</a></td>
+						<td>Jostins,L. et al. (2012) Host-microbe interactions have shaped the genetic architecture of inflammatory bowel disease. Nature, 491, 119–124.</td>
+						<td>Accept Data Access Agreement</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>Irritable Bowel Disease (IBD)</td>
+						<td><a href="http://www.ncbi.nlm.nih.gov/pubmed/23128233" target="_blank">Jostins L (<em>Nature 2012</em>)</a></td>
+						<td>Jostins,L. et al. (2012) Host-microbe interactions have shaped the genetic architecture of inflammatory bowel disease. Nature, 491, 119–124.</td>
+						<td>Accept Data Access Agreement</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>Juvenile Idiopathic Arthritis (JIA - UK)</td>
+						<td><a href="http://www.ncbi.nlm.nih.gov/pubmed/23603761" target="_blank">Hinks A (<em>Nat Genet 2013</em>)</a></td>
+						<td>Hinks,A. et al. (2013) Dense genotyping of immune-related disease regions identifies 14 new susceptibility loci for juvenile idiopathic arthritis. Nat. Genet., 45, 664–669.</td>
+						<td>Accept Data Access Agreement</td>
+						<td>Statistics for UK cohort only.</td>
+					</tr>
+					<tr>
+						<td>Multiple Sclerosis (MS)</td>
+						<td><a href="http://www.ncbi.nlm.nih.gov/pubmed/24076602" target="_blank">International Multiple Sclerosis Genetics Consortium (IMSGC) (<em>Nat Genet 2013</em>)</a></td>
+						<td>International Multiple Sclerosis Genetics Consortium (IMSGC) et al. (2013) Analysis of immune-related loci identifies 48 new susceptibility variants for multiple sclerosis. Nat. Genet., 45, 1353–1360.</td>
+						<td>Accept Data Access Agreement</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>Narcolepsy (NAR)</td>
+						<td><a href="http://www.ncbi.nlm.nih.gov/pubmed/23459209" target="_blank">Faraco J (<em>PLoS Genet 2013</em>)</a></td>
+						<td>Faraco,J. et al. (2013) ImmunoChip study implicates antigen presentation to T cells in narcolepsy. PLoS Genet., 9, e1003270.</td>
+						<td>Accept Data Access Agreement</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>Primary Billiary Cirrhosis (PBC)</td>
+						<td><a href="http://www.ncbi.nlm.nih.gov/pubmed/23143594" target="_blank">Tsoi LC (<em>Nat Genet 2012</em>)</a></td>
+						<td>Tsoi,L.C. et al. (2012) Identification of 15 new psoriasis susceptibility loci highlights the role of innate immunity. Nat. Genet., 44, 1341–1348.</td>
+						<td>Accept Data Access Agreement</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>Rheumatoid Arthritis (RA)</td>
+						<td><a href="http://www.ncbi.nlm.nih.gov/pubmed/23143596" target="_blank">Eyre S (<em>Nat Genet 2012</em>)</a></td>
+						<td>Eyre,S. et al. (2012) High-density genetic mapping identifies new susceptibility loci for rheumatoid arthritis. Nat. Genet., 44, 1336–1340.</td>
+						<td>Accept Data Access Agreement</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>Type 1 Diabetes (T1D)</td>
+						<td><a href="http://www.ncbi.nlm.nih.gov/pubmed/25751624" target="_blank">Onengut S (<em>Nat Genet 2015</em>)</a></td>
+						<td>Onengut-Gumuscu,S. et al. (2015) Fine mapping of type 1 diabetes susceptibility loci and evidence for colocalization of causal variants with lymphoid gene enhancers. Nat. Genet.</td>
+						<td>Accept Data Access Agreement</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>Ulcerative Colitis (UC)</td>
+						<td><a href="http://www.ncbi.nlm.nih.gov/pubmed/23128233" target="_blank">Jostins L (<em>Nature 2012</em>)</a></td>
+						<td>Jostins,L. et al. (2012) Host-microbe interactions have shaped the genetic architecture of inflammatory bowel disease. Nature, 491, 119–124.</td>
+						<td>Accept Data Access Agreement</td>
+						<td></td>
+					</tr>
+				</table>
+				
+				<a class="doc_link" name="chromstate_ds"></a>
+				<h4 class="docs4">Chromatin State Datasets</h4>
+				<p>Chromatin state data called using ChromHMM from the <a href="http://www.blueprint-epigenome.eu/">BLUEPRINT epigenome project</a> is available for certain matching cell types. For more information please see Javierre et al.(2016). 
+					
+					
+					
+						
+{% endblock %}
+
+
+{% block footer %}
+	
+	
+{% endblock %}
