@@ -362,7 +362,7 @@
 
 			localStorage["tissue"] = tissue
 			localStorage["target"] = target
-      url = "/chicp/search?searchTerm=" + term + '&tissue=' + tissue+'&targetIdx='+targetIdx+"&region=" + region;
+      url = "/chicp/search?searchTerm=" + term + '&tissue=' + tissue+'&targetIdx='+target+"&region=" + region;
     	if (gwas != "" && gwas !==null && gwas !==undefined) url += '&snp_track=' + gwas;
 			$.isLoading({ text: "Loading" });
 			// d3.json("/chicp/search?searchTerm="+term+"&region=" + region + '&targetIdx='+target+'&tissue=' + tissue + '&snp_track=' + gwas, function (error, data) {
