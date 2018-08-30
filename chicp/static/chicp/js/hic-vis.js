@@ -1261,6 +1261,7 @@ function resetPage(term, tissue, breadcrumb) {
     resetVis();
     $("#search_term").val(term);
     $(".page_header").html(term + " in " + tissue.replace(/_/g, " ") + " Tissues");
+    term = term.replace(/</g, "&lt;").replace(/>/g, "&gt;");
     termText = term
     termId = term
     if ($("#regionSearch").val() != '' && $("#regionSearch").val() != term){
