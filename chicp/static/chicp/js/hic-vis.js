@@ -686,6 +686,7 @@ function addGeneTrack(genes, totalBP){
 		.on("click", function (d) {
 				$("#search_term").val(d.gene_name);
 				var term = $("#search_term").val().toUpperCase();
+    				term = term.replace(/</g, "&lt;").replace(/>/g, "&gt;");
 				d3.selectAll("svg").remove();
 				doSearch()
 				//renderHic(term, tissue, 1);
@@ -769,6 +770,7 @@ function addSNPTrackPoints(snps, snpMeta, totalBP){
 		.on("click", function (d) {
             	$("#search_term").val(d.name);
             	var term = $("#search_term").val()
+    		term = term.replace(/</g, "&lt;").replace(/>/g, "&gt;");
             	d3.selectAll("svg").remove();
 				doSearch()
 				//renderHic(term, tissue, 1);
@@ -1275,6 +1277,7 @@ function renderVis() {
 	resetVis();
 	var tissue = $("input:radio[name=tissue]:checked").val();
 	var term = $("#search_term").val();
+	term = term.replace(/</g, "&lt;").replace(/>/g, "&gt;");
 						renderHic(term, tissue, 0);
 						//renderHic(term, tissue, diameter, 0);
 }
@@ -1306,6 +1309,7 @@ function zoomIn(innerRadius, circAvail, angleOffset){
 		var tissue = $("input:radio[name=tissue]:checked").val();
 		$("#regionSearch").val(region);
 		var term = $("#search_term").val();
+		term = term.replace(/</g, "&lt;").replace(/>/g, "&gt;");
 		renderHic(term, tissue, 1);
 		$("#regionSearch").val("");
 	}
@@ -1323,6 +1327,7 @@ $(document).ready(function () {
     $("input:radio[name=tissue]").bind("click", function () {
     		var tissue = $("input:radio[name=tissue]:checked").val();
     		var gene = $("#search_term").val();
+		gene = gene.replace(/</g, "&lt;").replace(/>/g, "&gt;");
     		$(".page_header").html(gene + " in " + tissue.replace(/_/g, " ") + " Tissues");
     		
 			localStorage["tissue"] = tissue;
@@ -1342,8 +1347,8 @@ $(document).ready(function () {
 
 function doSearch(){
 	var term = $("#search_term").val();
+	term = term.replace(/</g, "&lt;").replace(/>/g, "&gt;");
 	localStorage["searchTerm"] = term;
-	
 	localStorage["target"] = $("#target")[0].options[$("#target")[0].selectedIndex].value;
 	
 	if ($("input:radio[name=tissue]:checked").val() == undefined){
